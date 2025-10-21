@@ -1,6 +1,6 @@
 ---
 name: ros2-inspector
-description: This skill helps inspect and analyze ROS2 systems by generating Python scripts that automatically gather information about topics, nodes, and parameters. Claude should use this skill when the user asks to investigate ROS2 topics, nodes, parameters, or wants to understand the structure of a running ROS2 system. The skill creates inspection scripts using rclpy and formats results in Markdown or YAML.
+description: This skill helps inspect and analyze ROS2 systems by generating Python scripts that automatically gather information about topics, nodes, and parameters. Claude should use this skill when the user asks to investigate ROS2 topics (including specific topics and their publishers/subscribers), nodes, parameters, or wants to understand the structure of a running ROS2 system. The skill creates inspection scripts using rclpy and formats results in Markdown or YAML.
 ---
 
 # ROS2 Inspector
@@ -14,6 +14,9 @@ This skill enables automatic generation of ROS2 inspection scripts that gather c
 Use this skill when the user requests to:
 - "Inspect ROS2 topics in this system"
 - "Show me what nodes are running"
+- "Find which nodes publish/subscribe to a specific topic"
+- "Detect publishers and subscribers for [topic_name]"
+- "Investigate connections for a specific topic"
 - "Analyze the ROS2 system structure"
 - "Check topic frequencies and QoS settings"
 - "Get all parameters from running nodes"
@@ -249,21 +252,28 @@ ros2_system_snapshot:
 **Request**: "Show me all ROS2 topics"
 **Action**: Run `scripts/inspect_topics.py` with basic output
 
-### Use Case 2: Debug Communication Issues
+### Use Case 2: Detect Specific Topic Connections
+**Request**: "Please detect the node to publish and subscribe 'map_scan_front'"
+**Action**:
+1. Run `scripts/inspect_topics.py` to get comprehensive topic information
+2. Extract publisher and subscriber nodes for the specific topic
+3. Report message type, QoS settings, and optionally frequency
+
+### Use Case 3: Debug Communication Issues
 **Request**: "Why isn't /my_topic receiving messages?"
 **Action**:
 1. Run topic inspection to check publishers/subscribers
 2. Check QoS compatibility
 3. Verify message frequencies
 
-### Use Case 3: System Documentation
+### Use Case 4: System Documentation
 **Request**: "Create documentation of the current ROS2 system"
 **Action**:
 1. Run full system inspection
 2. Generate Markdown report
 3. Create Mermaid diagram of node connections
 
-### Use Case 4: Configuration Snapshot
+### Use Case 5: Configuration Snapshot
 **Request**: "Export all parameters for version control"
 **Action**: Run parameter inspection with YAML output
 
