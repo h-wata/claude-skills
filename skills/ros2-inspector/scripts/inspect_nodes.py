@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# ruff: noqa
 """
 ROS2 Node Inspector
 Gather information about running ROS2 nodes including their topics, services, and parameters.

@@ -1,0 +1,30 @@
+{
+    "metadata": {
+        "description": "Personal Claude Code skills collection for documentation, code analysis, ROS2, and workflow automation"
+    },
+    "name": "h-wata-claude-skills",
+    "owner": {
+        "name": "h-wata"
+    },
+    "plugins": [
+        {
+            "author": {
+                "name": "h-wata"
+            },
+            "category": "productivity",
+            "description": "Documentation, code analysis, ROS2, and workflow automation skills",
+            "keywords": [
+                "ros2",
+                "obsidian",
+                "documentation",
+                "code-review",
+                "robotics"
+            ],
+            "license": "Apache-2.0",
+            "name": "h-wata-skills",
+            "repository": "https://github.com/h-wata/claude-skills",
+            "source": ".",
+            "version": "1.0.0"
+        }
+    ]
+}

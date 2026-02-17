@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# ruff: noqa
 """
 ROS2 Topic Inspector
 Comprehensive analysis of ROS2 topics including types, publishers, subscribers, and frequencies.

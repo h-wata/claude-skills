@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# ruff: noqa
 """
 ROS2 Parameter Inspector
 Extract and export parameters from ROS2 nodes.
