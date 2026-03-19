@@ -73,16 +73,20 @@ Use the template from `assets/work-log-template.md` to structure the work log. T
 
 ### Step 4: Determine Output Location
 
-Ask the user for the Obsidian directory path if not already known. Common patterns:
-- `~/Documents/Obsidian/Work Logs/`
-- `~/Documents/my_obsidian/Tec_insight/`
-- User's specified directory
+Read `config.json` (in this skill's directory) to get the output settings:
 
-Default filename format: `{generated-title}.md`
+- `obsidian_vault_path`: Base path to the Obsidian vault
+- `log_subdirectory`: Optional subdirectory within the vault (empty string means root of vault path)
+- `filename_format`: Filename pattern (`{title}` is replaced with the generated title)
+- `default_tags`: Default tags to include in frontmatter
+
+If `config.json` has not been customized yet (first use), ask the user for their Obsidian vault path and update `config.json` accordingly for future sessions.
+
+The final output path is: `{obsidian_vault_path}/{log_subdirectory}/{filename}.md`
 
 ### Step 5: Write the Document
 
-Use the Write tool to create the work log file at the specified location with the generated content.
+Use the Write tool to create the work log file at the resolved output path with the generated content.
 
 ## Work Log Template Structure
 
@@ -172,3 +176,6 @@ This skill includes:
 
 ### assets/
 - `work-log-template.md` - The base template for creating work logs
+
+### config.json
+- Output path and default settings. Edit this file to change the Obsidian vault path, subdirectory, filename format, or default tags.
