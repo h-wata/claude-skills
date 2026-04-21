@@ -73,12 +73,14 @@ Use the template from `assets/work-log-template.md` to structure the work log. T
 
 ### Step 4: Determine Output Location
 
-Ask the user for the Obsidian directory path if not already known. Common patterns:
+If the user (or the invoking instruction) has already specified the output directory, use it without asking again. Ask only when unspecified. Common patterns:
 - `~/Documents/Obsidian/Work Logs/`
 - `~/Documents/my_obsidian/Tec_insight/`
 - User's specified directory
 
 Default filename format: `{generated-title}.md`
+
+**Filename style**: title case, 3-7 words, **hyphen-separated** (no spaces, no special characters other than `-` and `_`). Example: `API-Timeout-Extension-and-Test.md`. Collisions on the same day: append `-2`, `-3`, … suffix.
 
 ### Step 5: Write the Document
 
@@ -156,6 +158,19 @@ command2
 - [[Related Note 1]]
 - [[Related Note 2]]
 ```
+
+## Template Application Rules
+
+テンプレ (`assets/work-log-template.md`) を埋める際は次のルールを守る。これを守らないと成果物にプレースホルダや推測ダミーが残る。
+
+- **該当データが無いセクション**: 見出しは残し、本文を `_（なし）_` とだけ書く。テンプレのサンプル（`path/to/file1.ext`、`[Title](URL)`、`[[Related Note 1]]` 等）は**必ず削除**し、そのまま残さない
+- **サブ見出しの扱い（Files Modified / Resources Referenced 両方に適用）**: サブ見出し（`### Created` / `### Edited` / `### Documentation` / `### Code/Repositories` / `### Local Files`）は、該当データがあるものだけ残す。そのセクションの全サブ見出しに該当データが無ければ、**サブ見出しごと削除**し、親セクションに `_（なし）_` と 1 行だけ書く
+- **タグ**: `WorkLog` に加えて、セッション主題の topic tag を **2-4 個**（例: `api`, `timeout`, `testing`）。粒度はトピックを特定できる中粒度（広すぎず、狭すぎず）
+- **`session_time` の YAML クォート**: `18:28` のような HH:MM 値は YAML の sexagesimal 解釈を避けるため必ずダブルクォートで囲む（`session_time: "18:28"`）
+- **Related Notes**: 実在するノート名が特定できない場合は `_（なし）_`。推測で `[[Topic]]` のようなダミーを作らない
+- **Key Insights**: セッションで実際に発言・合意・発見された学び（結論、方針決定、非自明な知見など）のみ記載。セッション情報から無理に推論しない。該当がなければ `_（なし）_`
+- **ファイル名の語数**: 空白で区切った語を 1 語と数える（`vs`, `and`, `the` などの短い接続語も 1 語）。頭字語（`API`, `DDS` など）は大文字を維持、`vs` のような接続語は小文字のまま
+- **Duration**: 所要時間が分かれば記載（例: `約30分`）。分からなければ `_（不明）_`
 
 ## Best Practices
 
