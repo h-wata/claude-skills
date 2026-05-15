@@ -2,63 +2,97 @@
 
 A collection of custom skills for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that extend Claude's capabilities with specialized workflows.
 
+[日本語版 README はこちら](README_ja.md)
+
 ## Overview
 
-This repository manages all personal Claude Code skills in one place. Each skill is a self-contained directory with a `SKILL.md` that provides Claude with domain-specific instructions and workflows.
+This repository manages all personal Claude Code skills in one place. Each skill is a self-contained directory under `skills/` with a `SKILL.md` that provides Claude with domain-specific instructions and workflows.
 
 ```
 ~/work/claude-skills/              <- this repo
 ├── .claude-plugin/
 │   └── marketplace.json           <- plugin marketplace definition
-├── config.json                    <- shared config
+├── config.json                    <- shared config (e.g. Obsidian paths)
 ├── skills/
 │   ├── memo/SKILL.md
 │   ├── survey/SKILL.md
 │   └── ...
 ```
 
-## Available Skills
+## Available Skills (26)
 
 ### Documentation & Logging
 
-| Skill | Description | Slash Command |
-|-------|-------------|---------------|
+| Skill | Description | Slash |
+|-------|-------------|-------|
 | **memo** | Quick memo to Obsidian Daily note | `/memo` |
-| **work-log** | Log work notes from current conversation | `/work-log` |
+| **work-log** | Log work notes from the current conversation | `/work-log` |
 | **obsidian-work-logger** | Structured session work logs in Obsidian format | `/obsidian-work-logger` |
-| **interview** | Interactive interview for brainstorming, reviews, and note-taking | `/interview` |
+| **interview** | Interactive interview to elicit thoughts and ideas | `/interview` |
+| **meeting-minutes** | Create / update meeting minutes | `/meeting-minutes` |
+| **survey** | Build index summaries from PDFs, repos, or web docs | `/survey` |
 
-### Code Analysis & Review
+### Planning & Specification
 
-| Skill | Description | Slash Command |
-|-------|-------------|---------------|
-| **survey** | Create index summaries from PDFs, repos, and web docs | `/survey` |
-| **write-spec** | Generate implementation specs from survey results and source code | `/write-spec` |
-| **cross-review** | Cross-document consistency review (5 perspectives) | `/cross-review` |
-| **git-history** | Investigate git history and track change provenance | `/git-history` |
+| Skill | Description | Slash |
+|-------|-------------|-------|
+| **plan-with-qa** | Clarify vague specs via AskUserQuestion, then output a Markdown plan | `/plan-with-qa` |
+| **write-spec** | Generate implementation specs from survey results, source, or PDFs | `/write-spec` |
+| **empirical-prompt-tuning** | Iteratively improve agent prompts via blind execution + dual-side evaluation | `/empirical-prompt-tuning` |
+
+### Review & Analysis
+
+| Skill | Description | Slash |
+|-------|-------------|-------|
+| **cross-review** | Cross-document consistency review across multiple files | `/cross-review` |
 | **codex-consult** | Design consultation via Codex CLI (read-only) | `/codex-consult` |
 | **codex-review** | Code review via Codex CLI | `/codex-review` |
+| **config-analyzer** | Audit Claude Code config (CLAUDE.md, settings, hooks, skills, MCP) against best practices | `/config-analyzer` |
 
-### ROS2 & Robotics
+### Git & Release Workflow
 
-| Skill | Description | Slash Command |
-|-------|-------------|---------------|
-| **ros2-inspector** | Generate rclpy scripts to inspect ROS2 systems | `/ros2-inspector` |
+| Skill | Description | Slash |
+|-------|-------------|-------|
+| **git-history** | Investigate git history and trace change provenance | `/git-history` |
+| **safe-pathspec-commit** | Commit only target files without dragging in parallel WIP | `/safe-pathspec-commit` |
+| **inherit-wip** | Take over and finish a predecessor / paused worker's uncommitted WIP | `/inherit-wip` |
+| **release-apply** | Apply drafted release notes / CHANGELOG / migration; tag, push, GH release, close issues | `/release-apply` |
+
+### Architecture & Decision Records
+
+| Skill | Description | Slash |
+|-------|-------------|-------|
+| **adr** | Create / list / supersede Architecture Decision Records (manual only) | `/adr` |
+
+### ROS2, Robotics & 3DGS
+
+| Skill | Description | Slash |
+|-------|-------------|-------|
+| **ros2-inspector** | Generate rclpy scripts to inspect ROS2 topics / nodes / params | `/ros2-inspector` |
 | **ros-analyze** | ROS2 system state analysis (nodes, topics, fleet) | `/ros-analyze` |
-| **analyze-logs** | ROS/kachaka-api log analysis with error code reference | `/analyze-logs` |
+| **ros2-launch-debug** | Debug ROS2 launch files (params, dependencies, QoS) | `/ros2-launch-debug` |
+| **analyze-logs** | ROS / kachaka-api log analysis with error-code reference | `/analyze-logs` |
+| **nerfstudio-trainer** | Launch nerfstudio splatfacto (3D Gaussian Splatting) training with project-tuned params | `/nerfstudio-trainer` |
 
-### Planning & Workflow
+### mesh-mem / MCP / Distributed Tooling
 
-| Skill | Description | Slash Command |
-|-------|-------------|---------------|
-| **plan-with-qa** | Implementation planning with interactive Q&A to clarify specs | `/plan-with-qa` |
-| **meeting-minutes** | Meeting minutes creation and updates | `/meeting-minutes` |
+| Skill | Description | Slash |
+|-------|-------------|-------|
+| **add-mesh-peer** | Add a new host to an existing mesh-mem (Zenoh) mesh end-to-end | `/add-mesh-peer` |
+| **mcp-smoke-via-claude-p** | Run automated 5-case MCP smoke tests via `claude -p --output-format json` | `/mcp-smoke-via-claude-p` |
+
+### Setup & Configuration
+
+| Skill | Description | Slash |
+|-------|-------------|-------|
+| **setup-claude-local** | Bootstrap local ADR + `.claude/CLAUDE.md` + Obsidian vault integration | `/setup-claude-local` |
+| **config-analyzer** | (See Review & Analysis above) | `/config-analyzer` |
 
 ## Installation
 
-### Method 1: Plugin Install
+### Method 1: Plugin install (recommended)
 
-Register this repository as a plugin marketplace, then install all skills as a plugin:
+Register this repo as a plugin marketplace and install the bundled skills as a plugin:
 
 ```bash
 # Add this repo as a marketplace
@@ -74,15 +108,12 @@ Or use the interactive plugin manager:
 /plugin
 ```
 
-### Method 2: Symlink
-
-For development or if you want to manage skills individually:
+### Method 2: Symlink (for development)
 
 ```bash
 git clone https://github.com/h-wata/claude-skills.git ~/work/claude-skills
 cd ~/work/claude-skills
 
-# Create symlinks for all skills
 mkdir -p ~/.claude/skills
 for skill in skills/*/; do
   skill_name="$(basename "$skill")"
@@ -92,7 +123,7 @@ done
 
 ### Configuration
 
-`config.json` holds shared settings used by multiple skills (e.g., Obsidian daily notes path):
+`config.json` holds shared settings referenced by multiple skills (e.g. the Obsidian Daily note path):
 
 ```json
 {
@@ -108,19 +139,19 @@ claude-skills/
 │   └── marketplace.json      # Plugin marketplace definition
 ├── config.json               # Shared config for skills
 ├── skills/
-│   └── skill-name/
-│       ├── SKILL.md          # Skill instructions with YAML frontmatter (required)
-│       ├── scripts/          # Executable scripts (optional)
+│   └── <skill-name>/
+│       ├── SKILL.md          # YAML frontmatter + instructions (required)
+│       ├── scripts/          # Executable helpers (optional)
 │       ├── references/       # Documentation resources (optional)
-│       └── assets/           # Templates and output files (optional)
+│       └── assets/           # Templates / output files (optional)
 ```
 
-### SKILL.md Frontmatter
+### SKILL.md frontmatter
 
 ```yaml
 ---
 name: skill-name
-description: What this skill does
+description: What the skill does and when to use it
 allowed-tools: Read, Grep, Bash    # Tools allowed without permission prompt
 disable-model-invocation: true     # Manual-only invocation via /name
 ---
@@ -129,7 +160,10 @@ disable-model-invocation: true     # Manual-only invocation via /name
 ## Prerequisites
 
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) installed
-- For ROS2 skills: ROS2 environment (Humble, Iron, or Jazzy)
+- For ROS2 skills: ROS2 environment (Humble / Iron / Jazzy)
+- For `nerfstudio-trainer`: nerfstudio + a CUDA-capable GPU
+- For `add-mesh-peer` / `mcp-smoke-via-claude-p`: Zenoh / MCP environment
+- For Obsidian-backed skills: an Obsidian vault and `config.json` pointing at it
 
 ## References
 
@@ -140,4 +174,4 @@ disable-model-invocation: true     # Manual-only invocation via /name
 
 ## License
 
-Apache License 2.0 - see LICENSE file for details.
+Apache License 2.0 — see [LICENSE](LICENSE) for details.
