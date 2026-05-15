@@ -1,6 +1,6 @@
 ---
 name: codex-consult
-description: Codex CLIを使って設計相談やコードについての質問をする。read-onlyモードで安全に実行。
+description: Codex CLIを使って設計相談やコードについての質問をする。プロンプト指示で codex 側に書き込み禁止を伝える consult 型（sandbox は full-access、bwrap 迂回が必要なため）。
 disable-model-invocation: true
 ---
 
