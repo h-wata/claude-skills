@@ -10,21 +10,21 @@ Codex CLI を使って **外部 AI（OpenAI）にコードレビューを依頼*
 
 ## 絶対遵守ルール
 
-1. 下記の引数パターンで決まる codex review コマンドを **1 回だけ** 実行する。失敗しても **同一コマンドの再実行も別コマンドへの切替も行わない**（`--base` / `--commit` への fallback、リトライ、いずれも禁止）。
+1. 下記の引数パターンで決まる codex exec review コマンドを **1 回だけ** 実行する。失敗しても **同一コマンドの再実行も別コマンドへの切替も行わない**（`--base` / `--commit` への fallback、リトライ、いずれも禁止）。必ず `codex exec review` を使うこと。裸の `codex review`（exec なし）は対話TUIを起動し、非TTY環境（このスキルの実行環境）ではハングして起動しない。
 2. **レビュー対象のリポジトリを改変しない** (`git add` / `git commit` / `git stash` 等の禁止)。`git status` / `git diff` 等の読み取り系のみ許可。テスト/再現用に別ディレクトリで `git init` する分には対象外。
 3. codex 出力が失敗（後述の判定基準）なら、自前でレビューを書かず「Codex レビュー失敗」として失敗フォーマットで報告する。
 4. sandbox オプション（`-c sandbox_mode=danger-full-access`）を省略・変更しない。これがないと bwrap が user namespace を作れない環境で codex が diff を読めず空出力になる。
 
 ## 使い方
 
-`codex review` は `--uncommitted` / `--base` / `--commit` の各 scope フラグと自由文 PROMPT を **排他** で扱う。カスタム指示を渡す場合は scope フラグを外し、scope を PROMPT 本文に含めて指示する。
+`codex exec review` は `--uncommitted` / `--base` / `--commit` の各 scope フラグと自由文 PROMPT を **排他** で扱う。カスタム指示を渡す場合は scope フラグを外し、scope を PROMPT 本文に含めて指示する。
 
 | コマンド | 呼び出す codex |
 |---|---|
-| `/codex-review` | `codex review --uncommitted -c sandbox_mode=danger-full-access 2>&1` |
-| `/codex-review <自由文>` | `codex review -c sandbox_mode=danger-full-access "未コミットの変更をレビュー対象とする。追加指示: <自由文>" 2>&1` |
-| `/codex-review --base <branch>` | `codex review --base <branch> -c sandbox_mode=danger-full-access 2>&1` |
-| `/codex-review --commit <sha>` | `codex review --commit <sha> -c sandbox_mode=danger-full-access 2>&1` |
+| `/codex-review` | `codex exec review --uncommitted -c sandbox_mode=danger-full-access < /dev/null 2>&1` |
+| `/codex-review <自由文>` | `codex exec review -c sandbox_mode=danger-full-access "未コミットの変更をレビュー対象とする。追加指示: <自由文>" < /dev/null 2>&1` |
+| `/codex-review --base <branch>` | `codex exec review --base <branch> -c sandbox_mode=danger-full-access < /dev/null 2>&1` |
+| `/codex-review --commit <sha>` | `codex exec review --commit <sha> -c sandbox_mode=danger-full-access < /dev/null 2>&1` |
 
 ### 引数パターン判定
 
