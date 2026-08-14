@@ -108,7 +108,30 @@ fail-closed ゲートのみを実装済みです。
   回答という体裁を保ち、前提の再掲は最小限にする
 - **レビューコメント**: 指摘ごとに blocking (このままではマージ不可) か non-blocking
   (nit・提案) かを明示する。これが無いと著者はどこまで直せばよいか判断できない。
-  指摘は対象コードを引用してから書き、「どこの話か」を著者に探させない。引用は
-  GitHub の行コメントか、本文中のコードブロック引用 + `file:line` の明示のいずれかで
-  行う。対象コードを示さない「〜が問題です」「〜を修正してください」だけの指摘は
-  書かない
+  個別の指摘は必ず該当行の行コメント (inline review comment) として付ける。本文に
+  `file:line` + コードブロック引用でまとめる書き方は使わない。行コメントなら著者が
+  該当箇所を探さずに diff 上で直接解決できる。レビュー本文には全体の判断・検証結果・
+  依頼だけを残す。対象コードを示さない「〜が問題です」「〜を修正してください」だけの
+  指摘は書かない
+
+## レビューコメントの投稿手順
+
+`gh pr review --comment --body-file` は本文しか送れず、行コメントは付かない。行コメントは
+API を直接叩く。
+
+```
+gh api -X POST repos/OWNER/REPO/pulls/N/reviews --input - <<'EOF'
+{"commit_id": "<head SHA>", "event": "COMMENT", "body": "<全体の判断・依頼>",
+ "comments": [
+   {"path": "path/to/file", "line": 23, "side": "RIGHT", "body": "non-blocking / nit\n\n..."},
+   {"path": "path/to/file", "start_line": 15, "line": 21, "side": "RIGHT",
+    "start_side": "RIGHT", "body": "non-blocking / 提案\n\n..."}
+ ]}
+EOF
+```
+
+- 複数行にまたがる指摘は `start_line` + `start_side` を足す
+- 行番号は変更後ファイルの行番号。diff に現れない行にはアンカーできない
+- 提出済みレビューは削除できない (`Can not delete a non-pending pull request review`,
+  HTTP 422)。本文を差し替えるときは `PUT repos/OWNER/REPO/pulls/N/reviews/{review_id}`
+  で body を更新する。書き換え前に現在の body を必ず fetch する
