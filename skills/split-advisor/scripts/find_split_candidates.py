@@ -230,6 +230,7 @@ def main(argv: list[str] | None = None) -> int:
     print(f'top {len(ranked)} split candidates (score = lines x (1 + distinct rules violated)):\n')
     for candidate in ranked:
         print(candidate.as_text())
+    print('\nscore ranks candidates for triage only; it says nothing about split difficulty or priority.')
     return 0
 
 
