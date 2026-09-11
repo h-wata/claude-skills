@@ -14,6 +14,7 @@ Codex CLI を使って **外部 AI（OpenAI）にコードレビューを依頼*
 2. **レビュー対象のリポジトリを改変しない** (`git add` / `git commit` / `git stash` 等の禁止)。`git status` / `git diff` 等の読み取り系のみ許可。テスト/再現用に別ディレクトリで `git init` する分には対象外。
 3. codex 出力が失敗（後述の判定基準）なら、自前でレビューを書かず「Codex レビュー失敗」として失敗フォーマットで報告する。
 4. sandbox オプション（`-c sandbox_mode=danger-full-access`）を省略・変更しない。これがないと bwrap が user namespace を作れない環境で codex が diff を読めず空出力になる。
+5. **MCP 無効化フラグ（`$MCPOFF`、後述）を省略しない。** MCP サーバが有効なままだと codex が起動直後のツール呼び出しで無反応になり、リトライ禁止のため 1 回のタイムアウトで工程ごと落ちる。
 
 ## 使い方
 
@@ -21,10 +22,10 @@ Codex CLI を使って **外部 AI（OpenAI）にコードレビューを依頼*
 
 | コマンド | 呼び出す codex |
 |---|---|
-| `/codex-review` | `codex exec review --uncommitted -c sandbox_mode=danger-full-access < /dev/null 2>&1` |
-| `/codex-review <自由文>` | `codex exec review -c sandbox_mode=danger-full-access "未コミットの変更をレビュー対象とする。追加指示: <自由文>" < /dev/null 2>&1` |
-| `/codex-review --base <branch>` | `codex exec review --base <branch> -c sandbox_mode=danger-full-access < /dev/null 2>&1` |
-| `/codex-review --commit <sha>` | `codex exec review --commit <sha> -c sandbox_mode=danger-full-access < /dev/null 2>&1` |
+| `/codex-review` | `codex exec review --uncommitted -c sandbox_mode=danger-full-access $MCPOFF < /dev/null 2>&1` |
+| `/codex-review <自由文>` | `codex exec review -c sandbox_mode=danger-full-access $MCPOFF "未コミットの変更をレビュー対象とする。追加指示: <自由文>" < /dev/null 2>&1` |
+| `/codex-review --base <branch>` | `codex exec review --base <branch> -c sandbox_mode=danger-full-access $MCPOFF < /dev/null 2>&1` |
+| `/codex-review --commit <sha>` | `codex exec review --commit <sha> -c sandbox_mode=danger-full-access $MCPOFF < /dev/null 2>&1` |
 
 ### 引数パターン判定
 
@@ -33,11 +34,27 @@ Codex CLI を使って **外部 AI（OpenAI）にコードレビューを依頼*
 - `$ARGUMENTS` が `--commit <sha>` で始まる → commit
 - それ以外 → uncommitted + カスタム指示（scope フラグを付けず、scope と追加指示を PROMPT 本文に含める）
 
+## MCP 無効化フラグ `$MCPOFF`
+
+codex 実行前に必ず組み立てる。`-c mcp_servers={}` は効かない（設定がマージされて残る）。
+
+```bash
+MCPOFF=$(grep -oP '^\[mcp_servers\.\K[a-zA-Z0-9_-]+(?=\])' ~/.codex/config.toml \
+  | sort -u | sed 's|^|-c mcp_servers.|; s|$|.enabled=false|' | tr '\n' ' ')
+```
+
+`command` を `/bin/false` に差し替える方法は使わない。`url` ベース（streamable HTTP）のサーバが
+設定されていると `Error loading config.toml: url is not supported for stdio` で
+config 読み込みごと失敗する。`enabled=false` は stdio と url の両方に効く。
+
+`~/.codex/config.toml` に `[mcp_servers.*]` が 1 つも無ければ `$MCPOFF` は空になる。それで正しい。
+
 ## 実行手順
 
 1. `git status --short` で変更状況を確認。uncommitted パターンで差分ゼロなら codex を呼ばずに「レビュー対象なし」フォーマット（後述）で返す。
-2. 上記の表から 1 コマンドを選んで実行。タイムアウトは 180 秒程度見込む。
-3. 成功判定（下記）を行い、成功/失敗フォーマットで報告。
+2. `$MCPOFF` を組み立てる（上記）。
+3. 上記の表から 1 コマンドを選んで実行。タイムアウトは 300 秒程度見込む（reasoning effort が高い設定では 180 秒では足りないことがある）。
+4. 成功判定（下記）を行い、成功/失敗フォーマットで報告。
 
 ## 成功判定（機械的に）
 
@@ -96,6 +113,7 @@ codex 出力が **下記のいずれかを含めば失敗**:
 ### 対処案
 - `~/.codex/config.toml` で sandbox_mode を確認
 - bwrap が user namespace を作れない環境では `-c sandbox_mode=danger-full-access` 必須
+- タイムアウトで無反応だった場合は `$MCPOFF` が付いていたか確認（MCP サーバ起動でハングする）
 - 未認証の可能性があれば `codex login` を案内
 ```
 
