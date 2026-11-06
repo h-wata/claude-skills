@@ -31,6 +31,7 @@
 | **interview** | 考えや意見を引き出すインタビュー形式のメモ作成 | `/interview` |
 | **meeting-minutes** | 議事録の作成・更新 | `/meeting-minutes` |
 | **survey** | PDF・リポジトリ・Web ドキュメントの索引サマリーを作成 | `/survey` |
+| **drawio** | md から draw.io の図を XML で書き、draw.io Desktop の CLI で書き出して確かめる | `/drawio` |
 
 ### 計画・仕様化
 
