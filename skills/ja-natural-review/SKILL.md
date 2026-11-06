@@ -11,7 +11,8 @@ description: 日本語の報告書・調査結果・Slack 文案・README など
 先行する取り組みを土台にしている。
 
 - [textlint-ja/textlint-rule-preset-ai-writing](https://github.com/textlint-ja/textlint-rule-preset-ai-writing)（MIT, azu）：
-  AI が書いた文章に多い形（太字ラベルの箇条書き、述語のあとのコロン、誇張表現、太字の多用）を機械的に検出する
+  AI が書いた文章に多い形（太字ラベルの箇条書き、述語のあとのコロン、誇張表現、太字の多用）を機械的に検出する。
+  `scripts/check.py` は、このルールのうち正規表現で拾える分を移したもの
 - [geonwoo-jeong/japanese-humanizer](https://github.com/geonwoo-jeong/japanese-humanizer)（MIT）：
   翻訳調・冗長表現・係り受けなどの分類と優先度（P1〜P3）。下の「読み直しの目印」はその quick-rules を
   仕事の文書向けに絞ったもの。小説・翻訳・高リスク文書（法務・医療・契約）を直すときは、こちらを使う
@@ -19,15 +20,18 @@ description: 日本語の報告書・調査結果・Slack 文案・README など
 ## 手順
 
 1. 誰が何のために読む文章かをつかむ（会議資料、Slack、手順書、報告書など）
-2. **機械で検出する**（Node.js があるとき）
+2. **機械で検出する**
 
    ```bash
-   npx -y -p textlint@15 -p @textlint-ja/textlint-rule-preset-ai-writing \
-     textlint --preset @textlint-ja/textlint-rule-preset-ai-writing <ファイル.md>
+   python3 ~/.claude/skills/ja-natural-review/scripts/check.py <ファイル.md>
    ```
 
+   標準ライブラリだけで動く。textlint の ai-writing のルールのうち正規表現で拾える分（太字ラベルの
+   箇条書き、箇条書きの先頭の絵文字、見出し・文中の太字、述語のあとのコロン、大げさな言葉）と、
+   japanese-humanizer の P1 のうち機械で拾える分（冗長な言い回し、100字を超える文）、型どおりの締め、
+   文中の矢印を見る。`npx` で textlint を取ってくる方法は、依存パッケージの乗っ取りが怖いので使わない。
    検出は「見直す候補」であって、全部直す義務ではない。表の中の ✅／❌ のように、意味を持たせて
-   使っているものは残してよい。Node.js がなければこの手順は飛ばす
+   使っているものは残してよい
 3. **読み直す**：下の「読み直しの目印」に当たる箇所を探す。P1 から順に直す
 4. 直す。直すときの決まり
    - 事実・数値・日付・固有名詞・コマンド・パス・URL・結論・条件・否定を変えない。足さない、削らない
