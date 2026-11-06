@@ -32,6 +32,7 @@
 | **meeting-minutes** | 議事録の作成・更新 | `/meeting-minutes` |
 | **survey** | PDF・リポジトリ・Web ドキュメントの索引サマリーを作成 | `/survey` |
 | **drawio** | md から draw.io の図を XML で書き、draw.io Desktop の CLI で書き出して確かめる | `/drawio` |
+| **ja-natural-review** | 日本語の仕事の文書から機械的な書き癖を取り、自然な日本語に整える（textlint-ja の ai-writing と japanese-humanizer が土台） | `/ja-natural-review` |
 
 ### 計画・仕様化
 
